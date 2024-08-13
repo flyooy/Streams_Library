@@ -54,5 +54,10 @@ public class Main {
         System.out.println(library.getBooksByTitleKeyword("game"));
         //System.out.println(library.getMostLoanedBooks());
         System.out.println(library.getAverageLoanDuration());
+        System.out.println(library.getBooksLoanedByAuthor(author5));
+        System.out.println(library.getMostPopularAuthorByBorrowedBooksCount());
+        System.out.println(library.getLoanCountPerBook());
+        System.out.println(library.getMostLoanedBooks());
+        System.out.println(library.groupBooksByAuthor());
     }
 }

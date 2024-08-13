@@ -39,7 +39,11 @@ class Library {
 
     // 4. Übung
     public Map<Author, List<Book>> groupBooksByAuthor() {
-        return null;
+        return books.stream()
+                .flatMap(book->book.getAuthors().stream().map(
+                        author -> new AbstractMap.SimpleEntry<>(author,book)))
+                .collect(Collectors.groupingBy(Map.Entry::getKey,Collectors.mapping(Map.Entry::getValue,Collectors.toList())));
+
 
     }
 
@@ -48,7 +52,7 @@ class Library {
         return books.stream()
                 .flatMap(book->book.getAuthors().stream())
                 .distinct()
-                .sorted(Comparator.comparing(Author::getBirthYear).reversed())
+                .sorted(Comparator.comparing(Author::getBirthYear))
                 .findFirst();
     }
 
@@ -61,20 +65,31 @@ class Library {
 
     // 7. Übung
     public List<Book> getMostLoanedBooks() {
-        return  null;//loans.stream();
-//                .map(loan->loan.getBook())
-//                .max(Comparator.comparing(book -> book.))
+        return  loans.stream()
+                .map(Loan::getBook)
+                .collect(Collectors.groupingBy(book-> book, Collectors.counting()))
+                .entrySet().stream()
+                .sorted(Map.Entry.<Book, Long>comparingByValue().reversed())
+                .map(Map.Entry::getKey)
+                .limit(2)
+                .toList();
 
     }
 
     // 8. Übung
     public Map<Book, Long> getLoanCountPerBook() {
-        return null;
+        return loans.stream()
+                .map(Loan::getBook)
+                .collect(Collectors.groupingBy(book-> book, Collectors.counting()));
     }
 
     // 9. Übung
     public List<Book> getBooksLoanedByAuthor(Author author) {
-        return null;
+        return loans.stream()
+                .filter(l->l.getBook().getAuthors().contains(author))
+                        .map(Loan::getBook)
+                        .distinct()
+                        .collect(Collectors.toList());
     }
 
     // 10. Übung
@@ -87,6 +102,14 @@ class Library {
     }
 
     // Bonus: 11. Übung
-    public String getMostPopularAuthorByBorrowedBooksCount() { return null;}
+    public String getMostPopularAuthorByBorrowedBooksCount() {
+        return loans.stream()
+                .flatMap(l->l.getBook().getAuthors().stream())
+                .collect(Collectors.groupingBy(a->a.getName(),Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+    }
 
 }
